@@ -9,8 +9,8 @@ Built with **Next.js (App Router)**, **JavaScript** and **Tailwind CSS**, deploy
 
 You need **Node.js 20 or newer** ([download](https://nodejs.org)) and **Git**.
 
-1. Click **Fork** (top right of this page) to copy the repo to your GitHub account.
-2. Clone your fork and run it:
+1. Click **Use this template → Create a new repository** (top right of this page). Name it, keep it **Public**, and create it.
+2. Clone your new repo and run it:
 
 ```bash
 git clone https://github.com/<your-username>/<repo-name>.git
@@ -49,7 +49,10 @@ Ideas: a mobile menu, dark mode, subtle animations, an Arabic version (`lang="ar
 
 ## 4. Deploy to GitHub Pages
 
-1. In your fork, go to **Settings → Pages** and set **Source** to **GitHub Actions**.
+1. In your repo, go to **Settings → Pages** and set **Source** to **GitHub Actions**.
+
+   > The first deploy runs as soon as you create your repo, before Pages is on, so it fails with a **404** error. That's expected. After this step, open the **Actions** tab, select the failed run, and click **Re-run all jobs**.
+
 2. Push to `main`:
 
 ```bash
