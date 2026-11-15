@@ -9,8 +9,8 @@ Built with **Next.js (App Router)**, **JavaScript** and **Tailwind CSS**, deploy
 
 You need **Node.js 20 or newer** ([download](https://nodejs.org)) and **Git**.
 
-1. Click **Use this template → Create a new repository** (top right of this page). Name it, keep it **Public**, and create it.
-2. Clone your new repo and run it:
+1. Click **Fork** (top right of this page), then **Create fork**. This copies the repo to your GitHub account.
+2. Clone your fork and run it:
 
 ```bash
 git clone https://github.com/<your-username>/<repo-name>.git
@@ -49,11 +49,9 @@ Ideas: a mobile menu, dark mode, subtle animations, an Arabic version (`lang="ar
 
 ## 4. Deploy to GitHub Pages
 
-1. In your repo, go to **Settings → Pages** and set **Source** to **GitHub Actions**.
-
-   > The first deploy runs as soon as you create your repo, before Pages is on, so it fails with a **404** error. That's expected. After this step, open the **Actions** tab, select the failed run, and click **Re-run all jobs**.
-
-2. Push to `main`:
+1. In your fork, open the **Actions** tab and click **I understand my workflows, go ahead and enable them**. GitHub turns off workflows in forks until you do this, so without it nothing deploys.
+2. Go to **Settings → Pages** and set **Source** to **GitHub Actions**.
+3. Push to `main`:
 
 ```bash
 git add .
@@ -61,7 +59,7 @@ git commit -m "Add my CV"
 git push
 ```
 
-3. Open the **Actions** tab and wait for the green check. Your site is live at:
+4. Open the **Actions** tab and wait for the green check. Your site is live at:
    `https://<your-username>.github.io/<repo-name>/`
 
 Every push to `main` deploys again automatically.
