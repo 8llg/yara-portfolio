@@ -1,0 +1,138 @@
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 900ms var(--ease-out),
+      transform 1100ms var(--ease-expo);
+    transition-delay: calc(var(--i, var(--stagger, 0)) * 70ms);
+  }
+
+  [data-reveal].is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  .shift__bar {
+    clip-path: inset(0 0 0 0);
+    transition: clip-path 1.1s var(--ease-in-out) 0.25s;
+  }
+
+  .shift__dot--to {
+    transition:
+      inset-inline-start 1.1s var(--ease-in-out) 0.25s,
+      transform 0.4s var(--ease-out) 1.2s;
+  }
+
+  .shift:not(.is-visible) .shift__dot--to {
+    inset-inline-start: var(--from);
+    transform: scale(0.4);
+  }
+
+  :root[dir='ltr'] .shift[data-direction='rises']:not(.is-visible) .shift__bar,
+  :root[dir='rtl'] .shift[data-direction='falls']:not(.is-visible) .shift__bar {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  :root[dir='ltr'] .shift[data-direction='falls']:not(.is-visible) .shift__bar,
+  :root[dir='rtl'] .shift[data-direction='rises']:not(.is-visible) .shift__bar {
+    clip-path: inset(0 0 0 100%);
+  }
+
+  .skill__bar span {
+    transition: inline-size 1.2s var(--ease-in-out) calc(0.15s + var(--stagger, 0) * 50ms);
+  }
+
+  .skill:not(.is-visible) .skill__bar span {
+    inline-size: 0;
+  }
+
+  :root:not(.has-turned) .marquee {
+    animation: marquee-in 1.6s var(--ease-expo) both;
+  }
+
+  :root:not(.has-turned) .marquee--arabic {
+    animation-delay: 0.12s;
+  }
+
+  :root:not(.has-turned) .hero__intro,
+  :root:not(.has-turned) .cta,
+  :root:not(.has-turned) .hero__caption {
+    animation: rise-in 1.1s var(--ease-expo) both;
+  }
+
+  :root:not(.has-turned) .hero__intro {
+    animation-delay: 0.5s;
+  }
+
+  :root:not(.has-turned) .cta {
+    animation-delay: 0.7s;
+  }
+
+  :root:not(.has-turned) .hero__caption {
+    animation-delay: 1.4s;
+  }
+
+  @keyframes marquee-in {
+    from {
+      opacity: 0;
+      transform: translateY(18%);
+    }
+  }
+
+  @keyframes rise-in {
+    from {
+      opacity: 0;
+      transform: translateY(28px);
+    }
+  }
+
+  ::view-transition-old(root) {
+    animation: none;
+  }
+
+  ::view-transition-new(root) {
+    animation: 1s var(--ease-in-out) both;
+  }
+
+  :root[data-turn='rtl']::view-transition-new(root) {
+    animation-name: turn-rtl;
+  }
+
+  :root[data-turn='ltr']::view-transition-new(root) {
+    animation-name: turn-ltr;
+  }
+
+  @keyframes turn-rtl {
+    from {
+      clip-path: inset(0 0 0 100%);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  @keyframes turn-ltr {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .marquee__track {
+    animation: none !important;
+  }
+}

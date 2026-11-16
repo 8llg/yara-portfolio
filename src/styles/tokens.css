@@ -1,0 +1,79 @@
+:root {
+  --night: #1c1418;
+  --night-2: #261b20;
+  --night-line: #3d2e35;
+  --on-night: #efe7df;
+  --on-night-2: #b6a6ac;
+  --bone: #ebe5de;
+  --bone-2: #e2dad1;
+  --bone-line: #cdc1b6;
+  --on-bone: #1c1418;
+  --on-bone-2: #5a4e54;
+  --saffron: #d9a441;
+  --saffron-deep: #8a5e12;
+  --plum: #6e4a57;
+
+  --paper: var(--bone);
+  --paper-raised: #f3eee8;
+  --paper-sunk: var(--bone-2);
+  --ink: var(--on-bone);
+  --ink-2: var(--on-bone-2);
+  --ink-3: #665960;
+  --rule: var(--bone-line);
+  --rule-soft: #ddd3c9;
+  --green: var(--saffron-deep);
+  --green-strong: #6d4a0e;
+  --green-wash: #efdcb4;
+  --on-green: #fff8ec;
+  --accent-fill: var(--saffron);
+
+  --display: 'Alexandria Variable', 'Segoe UI', Tahoma, sans-serif;
+  --body: 'Readex Pro Variable', 'Segoe UI', Tahoma, sans-serif;
+  --naskh: 'Noto Naskh Arabic Variable', 'Geeza Pro', serif;
+  --code: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+  --latin: var(--body);
+  --arabic: var(--body);
+  --mono: var(--body);
+  --kufi: var(--body);
+  --face: var(--body);
+  --label-face: var(--body);
+  --label-size: 0.84rem;
+  --label-tracking: 0;
+  --label-case: none;
+
+  --gutter: clamp(18px, 4.4vw, 72px);
+  --max: 1480px;
+  --masthead: 72px;
+  --radius: 4px;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-micro: 180ms;
+  --dur-ui: 320ms;
+  --dur-scene: 900ms;
+  --dir: 1;
+
+  color-scheme: light;
+}
+
+:root[dir='rtl'] {
+  --dir: -1;
+}
+
+.on-night {
+  --paper: var(--night);
+  --paper-raised: var(--night-2);
+  --paper-sunk: #2e2228;
+  --ink: var(--on-night);
+  --ink-2: var(--on-night-2);
+  --ink-3: #8f7f86;
+  --rule: var(--night-line);
+  --rule-soft: #2f2329;
+  --green: var(--saffron);
+  --green-strong: #f0c46c;
+  --green-wash: #3a2a1c;
+  --on-green: var(--night);
+  color-scheme: dark;
+  background: var(--paper);
+  color: var(--ink);
+}

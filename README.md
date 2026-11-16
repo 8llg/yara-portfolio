@@ -1,96 +1,54 @@
-# Portfolio Summit · Starter
+# Yara Al-Mansouri Portfolio | يارا المنصوري
 
-Turn the CV you were given into a live portfolio website.
-Built with **Next.js (App Router)**, **JavaScript** and **Tailwind CSS**, deployed for free on **GitHub Pages**.
+Our portfolio website for Dr. Yara Saud Al-Mansouri, built for Portfolio Summit 2026 at Al Yamamah University.
 
----
+**Live site:** https://8llg.github.io/yara-portfolio/
 
-## 1. Get started
+## The idea
 
-You need **Node.js 20 or newer** ([download](https://nodejs.org)) and **Git**.
+Yara works between two languages and two reading directions, so the site is built to read in both. Switching to Arabic mirrors the whole page, not just the text.
 
-1. Click **Fork** (top right of this page), then **Create fork**. This copies the repo to your GitHub account.
-2. Clone your fork and run it:
+## Features
+
+- 3D character in a black abaya, hijab and niqab that follows the mouse and turns when the language changes
+- Full English and Arabic versions (LTR and RTL)
+- Eight case studies with problem, role, solution and results
+- Impact explorer: 35 results from the CV, filterable by field
+- Career timeline
+- Arabic typography lab based on Yara's PhD research
+- Design system playground with live contrast checks
+- Full CV explorer: 110 entries, searchable in both languages
+- Download the original CV as PDF
+- Command palette (`Ctrl+K`), guided tour and presentation mode (`P`)
+- Keyboard shortcuts: `1` to `8` for sections, `0` for top, `L` for language, `?` for help
+
+## Tech
+
+- Vite and TypeScript
+- Three.js for the character
+- GSAP and Lenis for scroll animation
+- Fonts: Alexandria, Readex Pro, Noto Naskh Arabic
+
+All CV content is stored in `src/content/` with English and Arabic side by side.
+
+## Run locally
 
 ```bash
-git clone https://github.com/<your-username>/<repo-name>.git
-cd <repo-name>
 npm install
 npm run dev
 ```
 
-3. Open http://localhost:3000. Changes show up as soon as you save.
+Then open http://localhost:5173. Add `?lang=ar` to open in Arabic.
 
-## 2. Add your CV
-
-Everything on the site comes from **one file: `data/cv.js`**.
-Replace the placeholder text with the information from your CV: personal info, education, experience, projects, skills and achievements.
-
-- Each project gets its own page at `/projects/<slug>`. Keep slugs short and lowercase, like `weather-app`.
-- Your photo: put it in `assets/` and change the import in `app/page.js`.
-- A downloadable CV: put the PDF in `public/` and set `cvFile` in `cv.js`.
-
-> Don't hard-code CV text inside components. Keep it in `cv.js`, and let the components read from it.
-
-## 3. Make it yours
-
-The starter is intentionally plain. The design is your job.
-
-| File | What it does |
-| --- | --- |
-| `data/cv.js` | All your CV content |
-| `app/layout.js` | Shared frame (navbar, footer), font, page title |
-| `app/page.js` | The home page and its sections |
-| `app/projects/[slug]/page.js` | One page per project |
-| `components/` | Reusable pieces: `Navbar`, `Section`, `ProjectCard`, `Footer` |
-| `app/globals.css` | Global styles and your theme colors |
-
-Ideas: a mobile menu, dark mode, subtle animations, an Arabic version (`lang="ar" dir="rtl"`), better typography.
-
-## 4. Deploy to GitHub Pages
-
-1. In your fork, open the **Actions** tab and click **I understand my workflows, go ahead and enable them**. GitHub turns off workflows in forks until you do this, so without it nothing deploys.
-2. Go to **Settings → Pages** and set **Source** to **GitHub Actions**.
-3. Push to `main`:
+## Build
 
 ```bash
-git add .
-git commit -m "Add my CV"
-git push
+npm run build
+npm run preview
 ```
 
-4. Open the **Actions** tab and wait for the green check. Your site is live at:
-   `https://<your-username>.github.io/<repo-name>/`
+The build goes to `out/` and is deployed to GitHub Pages automatically on every push to `main`.
 
-Every push to `main` deploys again automatically.
+## Performance
 
-**Custom domain or a `<username>.github.io` repo?** In `.github/workflows/deploy.yml`, set `NEXT_PUBLIC_BASE_PATH` to `""`. For a custom domain, also add a `public/CNAME` file containing your domain.
-
-### Things that work differently on GitHub Pages
-
-GitHub Pages only hosts static files, with no server. So:
-
-- **Images:** import them (`import photo from "@/assets/me.jpg"`) instead of using `/public` paths.
-- **Links to files in `public/`:** use `withBase("/file.pdf")` from `lib/withBase.js`.
-- **No server features:** no API routes, Server Actions or middleware. For a contact form, use a form service or a `mailto:` link.
-
-Run `npm run build` before you push. If it builds locally, it will deploy.
-
-## 5. Judging criteria
-
-| Criterion | Weight |
-| --- | --- |
-| Functionality & Responsiveness: working features, interactive elements, stability, works on all devices | 25% |
-| Visual Design & Creativity: visual appeal, originality, typography, color consistency | 20% |
-| User Experience & Navigation: easy navigation, clear hierarchy, readability, accessibility | 20% |
-| Content Structure & Storytelling: how well the CV becomes an engaging professional portfolio | 20% |
-| CV Accuracy & Completeness: content matches the provided CV, nothing missing | 15% |
-
-## 6. Submission
-
-Submit the link to your **live site** and your **GitHub repo**.
-
-## Learn more
-
-- [Next.js Learn](https://nextjs.org/learn) · [Next.js Docs](https://nextjs.org/docs)
-- [Tailwind CSS Docs](https://tailwindcss.com/docs)
+Lighthouse on desktop: Performance 99, Accessibility 100, Best Practices 100.

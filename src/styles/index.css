@@ -1,0 +1,13 @@
+@import '@fontsource-variable/alexandria/wght.css';
+@import '@fontsource-variable/readex-pro/wght.css';
+@import '@fontsource-variable/noto-naskh-arabic/wght.css';
+@import '@fontsource/ibm-plex-mono/latin-400.css';
+@import './tokens.css';
+@import './base.css';
+@import './chrome.css';
+@import './hero.css';
+@import './components.css';
+@import './work.css';
+@import './sections.css';
+@import './features.css';
+@import './motion.css';
