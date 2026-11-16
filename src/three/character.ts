@@ -260,8 +260,8 @@ function buildProcedural(detail: number): Rig {
   const headPivot = new Group();
   headPivot.position.set(0, 3.95, 0);
   const head = new Group();
-  head.position.set(0, 0.3, 0.02);
-  head.scale.setScalar(0.55);
+  head.position.set(0, 0.33, 0.03);
+  head.scale.setScalar(0.6);
   headPivot.add(head);
   root.add(headPivot);
 
@@ -423,14 +423,15 @@ function buildProcedural(detail: number): Rig {
 
   const arms = new Group();
   body.add(arms);
+  const sleeveCloth = toon('#332b39');
   [-1, 1].forEach((side) => {
     const shoulder = new Vector3(0.56 * side, 3.6, 0.02);
     const elbow = new Vector3(0.74 * side, 2.78, 0.12);
     const wrist = new Vector3(0.5 * side, 2.5, 0.66);
     const sleeveCurve = new CatmullRomCurve3([shoulder, new Vector3(0.7 * side, 3.2, 0.04), elbow, new Vector3(0.66 * side, 2.6, 0.4), wrist]);
-    const sleeve = withOutline(new Mesh(new TubeGeometry(sleeveCurve, 48, 0.15, 16, false), cloth), bodyOutline);
+    const sleeve = withOutline(new Mesh(new TubeGeometry(sleeveCurve, 48, 0.15, 16, false), sleeveCloth), bodyOutline);
     arms.add(sleeve);
-    const cuff = withOutline(new Mesh(new SphereGeometry(0.19, 24, 16), cloth), bodyOutline);
+    const cuff = withOutline(new Mesh(new SphereGeometry(0.19, 24, 16), sleeveCloth), bodyOutline);
     cuff.scale.set(1, 1, 0.55);
     cuff.position.copy(wrist);
     cuff.lookAt(wrist.clone().add(new Vector3(-0.3 * side, -0.1, 1)));
@@ -499,15 +500,15 @@ function buildProcedural(detail: number): Rig {
 
 async function loadVrm(scene: Scene): Promise<Rig | null> {
   try {
-    const probe = await fetch(`${import.meta.env.BASE_URL}models/yara.vrm`, { method: 'HEAD' });
-    if (!probe.ok || (probe.headers.get('content-type') ?? '').includes('text/html')) return null;
+    const model = import.meta.env.VITE_CHARACTER_MODEL as string | undefined;
+    if (!model) return null;
     const [{ GLTFLoader }, { VRMLoaderPlugin, VRMUtils }] = await Promise.all([
       import('three/examples/jsm/loaders/GLTFLoader.js'),
       import('@pixiv/three-vrm'),
     ]);
     const loader = new GLTFLoader();
     loader.register((parser) => new VRMLoaderPlugin(parser));
-    const gltf = await loader.loadAsync(`${import.meta.env.BASE_URL}models/yara.vrm`);
+    const gltf = await loader.loadAsync(`${import.meta.env.BASE_URL}${model}`);
     const vrm = gltf.userData.vrm as import('@pixiv/three-vrm').VRM | undefined;
     if (!vrm) return null;
     VRMUtils.removeUnnecessaryVertices(gltf.scene);
@@ -614,7 +615,7 @@ export async function mountBust(canvas: HTMLCanvasElement, options: Options): Pr
   }
 
   const hero = canvas.closest<HTMLElement>('.hero');
-  const FIGURE = 4.85;
+  const FIGURE = 4.98;
   const stacked = window.matchMedia('(max-width: 600px), (max-aspect-ratio: 1/1)');
   const frame3 = { x: 0, cy: 2.4, d: 14, wide: true };
   const project = (x: number, y: number) => {
