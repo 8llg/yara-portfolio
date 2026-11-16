@@ -501,7 +501,7 @@ const loadMotion = () => {
   motionRequested = true;
   void import('./motion').then((module) => {
     motion = module;
-    if (!reducedMotion) lenis = module.startSmoothScroll();
+    if (!reducedMotion && !window.matchMedia('(pointer: coarse)').matches) lenis = module.startSmoothScroll();
     if (app && deferredDone) mountMotionLayer(app);
   });
 };
@@ -510,8 +510,10 @@ window.addEventListener('touchstart', loadMotion, { once: true, passive: true })
 window.addEventListener('keydown', loadMotion, { once: true });
 window.addEventListener('scroll', loadMotion, { once: true, passive: true });
 const idleMotion = window.requestIdleCallback as typeof window.requestIdleCallback | undefined;
-if (idleMotion) idleMotion(loadMotion, { timeout: 2500 });
-else window.setTimeout(loadMotion, 1200);
+if (!lowPower) {
+  if (idleMotion) idleMotion(loadMotion, { timeout: 2500 });
+  else window.setTimeout(loadMotion, 1200);
+}
 if (location.hash) {
   ensureRendered();
   const target = document.getElementById(location.hash.slice(1));

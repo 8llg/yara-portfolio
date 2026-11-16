@@ -204,13 +204,46 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
+  .project__button {
+    isolation: isolate;
+  }
+
+  .project__button::before {
+    content: '';
+    position: absolute;
+    inset: -1px 0 0;
+    z-index: -1;
+    background: var(--on-night);
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path 700ms var(--ease-expo);
+  }
+
+  :root[dir='rtl'] .project__button::before {
+    clip-path: inset(0 0 0 100%);
+  }
+
+  .project__org,
+  .project__year {
+    transition: transform 600ms var(--ease-expo), color var(--dur-ui);
+  }
+
   .projects:hover .project__button:not(:hover) {
-    opacity: 0.32;
+    opacity: 0.38;
+  }
+
+  .project__button:hover::before {
+    clip-path: inset(0 0 0 0);
   }
 
   .project__button:hover .project__name {
-    transform: translateX(calc(var(--dir) * 18px));
-    color: var(--saffron);
+    transform: translateX(calc(var(--dir) * 28px));
+    color: var(--night);
+  }
+
+  .project__button:hover .project__org,
+  .project__button:hover .project__year {
+    transform: translateX(calc(var(--dir) * -28px));
+    color: #5d4b54;
   }
 }
 
@@ -225,9 +258,14 @@
   z-index: 40;
   inline-size: clamp(260px, 22vw, 360px);
   aspect-ratio: 4 / 3;
-  margin: calc(clamp(260px, 22vw, 360px) * -0.375) 0 0 calc(clamp(260px, 22vw, 360px) * -0.5);
+  margin: calc(clamp(260px, 22vw, 360px) * -0.375) 0 0 48px;
   pointer-events: none;
   will-change: transform;
+}
+
+:root[dir='rtl'] .preview {
+  margin-inline-start: 0;
+  margin-left: calc(clamp(260px, 22vw, 360px) * -1 - 48px);
 }
 
 .preview__frame {

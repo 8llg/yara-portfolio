@@ -1,6 +1,7 @@
 import {
   ACESFilmicToneMapping,
   BackSide,
+  BoxGeometry,
   BufferGeometry,
   CanvasTexture,
   CapsuleGeometry,
@@ -19,6 +20,7 @@ import {
   NearestFilter,
   Object3D,
   PerspectiveCamera,
+  PlaneGeometry,
   Raycaster,
   RedFormat,
   Scene,
@@ -181,6 +183,59 @@ function irisTexture(): CanvasTexture {
   return texture;
 }
 
+function screenTexture(): CanvasTexture {
+  const canvas = document.createElement('canvas');
+  canvas.width = 640;
+  canvas.height = 420;
+  const ctx = canvas.getContext('2d');
+  if (ctx) {
+    ctx.fillStyle = '#ebe5de';
+    ctx.fillRect(0, 0, 640, 420);
+    ctx.fillStyle = '#1c1418';
+    ctx.font = "700 58px 'Alexandria Variable', 'Segoe UI', sans-serif";
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'left';
+    ctx.fillText('Yara', 44, 92);
+    ctx.textAlign = 'right';
+    ctx.direction = 'rtl';
+    ctx.fillText('يارا', 596, 92);
+    ctx.fillStyle = '#d9a441';
+    ctx.save();
+    ctx.translate(320, 92);
+    ctx.rotate(Math.PI / 4);
+    ctx.fillRect(-13, -13, 26, 26);
+    ctx.restore();
+    const rows = [0.82, 0.6, 0.72, 0.48];
+    rows.forEach((w, i) => {
+      const y = 190 + i * 44;
+      ctx.fillStyle = i === 0 ? '#1c1418' : '#b8aca2';
+      ctx.fillRect(44, y, 240 * w, 14);
+      ctx.fillRect(596 - 240 * rows[(i + 2) % 4], y, 240 * rows[(i + 2) % 4], 14);
+    });
+    ctx.fillStyle = '#d9a441';
+    ctx.fillRect(44, 372, 552, 6);
+  }
+  const texture = new CanvasTexture(canvas);
+  texture.colorSpace = SRGBColorSpace;
+  return texture;
+}
+
+function shadowTexture(): CanvasTexture {
+  const canvas = document.createElement('canvas');
+  canvas.width = 128;
+  canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  if (ctx) {
+    const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+    grad.addColorStop(0, 'rgba(10, 6, 9, 0.55)');
+    grad.addColorStop(0.55, 'rgba(10, 6, 9, 0.22)');
+    grad.addColorStop(1, 'rgba(10, 6, 9, 0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 128, 128);
+  }
+  return new CanvasTexture(canvas);
+}
+
 function buildProcedural(detail: number): Rig {
   const gradientMap = toonGradient();
   const toon = (color: string) => new MeshToonMaterial({ color, gradientMap });
@@ -189,8 +244,9 @@ function buildProcedural(detail: number): Rig {
   const maskMat = toon(COLORS.mask);
   const trim = toon(COLORS.trim);
   const lashMat = new MeshBasicMaterial({ color: COLORS.lash });
-  const outline = outlineMaterial(0.012);
-  const outlineThick = outlineMaterial(0.02);
+  const outline = outlineMaterial(0.026);
+  const outlineThick = outlineMaterial(0.04);
+  const bodyOutline = outlineMaterial(0.022);
   const hitTargets: Object3D[] = [];
 
   const withOutline = (mesh: Mesh, material = outline) => {
@@ -202,9 +258,10 @@ function buildProcedural(detail: number): Rig {
 
   const root = new Group();
   const headPivot = new Group();
-  headPivot.position.set(0, 1.2, 0);
+  headPivot.position.set(0, 3.95, 0);
   const head = new Group();
-  head.position.set(0, 0.52, 0);
+  head.position.set(0, 0.3, 0.02);
+  head.scale.setScalar(0.55);
   headPivot.add(head);
   root.add(headPivot);
 
@@ -321,35 +378,97 @@ function buildProcedural(detail: number): Rig {
 
   const body = new Group();
   root.add(body);
-  const torsoProfile = [
-    new Vector2(0.001, 0.62),
-    new Vector2(0.5, 0.6),
-    new Vector2(1.1, 0.38),
-    new Vector2(1.38, 0.1),
-    new Vector2(1.46, -0.4),
-    new Vector2(1.44, -1.1),
-    new Vector2(1.5, -1.9),
-    new Vector2(0.001, -1.9),
+  const depth = 0.7;
+  const profile = [
+    new Vector2(0.001, 3.92),
+    new Vector2(0.24, 3.9),
+    new Vector2(0.52, 3.78),
+    new Vector2(0.63, 3.55),
+    new Vector2(0.62, 3.1),
+    new Vector2(0.58, 2.6),
+    new Vector2(0.62, 2.05),
+    new Vector2(0.7, 1.3),
+    new Vector2(0.8, 0.45),
+    new Vector2(0.86, 0.12),
+    new Vector2(0.84, 0.05),
+    new Vector2(0.001, 0.05),
   ];
-  const torso = withOutline(new Mesh(new LatheGeometry(torsoProfile, Math.max(48, detail)), cloth), outlineThick);
-  torso.scale.set(1, 1, 0.55);
-  torso.position.set(0, 0, -0.08);
-  body.add(torso);
-  hitTargets.push(torso);
+  const radiusAt = (y: number) => {
+    for (let i = 0; i < profile.length - 2; i += 1) {
+      const a = profile[i];
+      const b = profile[i + 1];
+      if (y <= a.y && y >= b.y) return a.x + ((b.x - a.x) * (a.y - y)) / (a.y - b.y || 1);
+    }
+    return 0.8;
+  };
+  const abaya = withOutline(new Mesh(new LatheGeometry(profile, Math.max(48, detail)), cloth), bodyOutline);
+  abaya.scale.set(1, 1, depth);
+  body.add(abaya);
+  hitTargets.push(abaya);
 
   [-1, 1].forEach((side) => {
-    const sleeve = withOutline(new Mesh(new CapsuleGeometry(0.34, 1.5, 8, 24), cloth), outlineThick);
-    sleeve.position.set(1.42 * side, -0.85, 0.02);
-    sleeve.rotation.z = 0.1 * side;
-    body.add(sleeve);
-    const edge = new CatmullRomCurve3([
-      new Vector3(0.1 * side, 0.6, 0.62 * 0.55 + 0.05),
-      new Vector3(0.22 * side, 0.1, 0.8 * 0.55 + 0.04),
-      new Vector3(0.28 * side, -0.6, 0.82 * 0.55 + 0.04),
-      new Vector3(0.3 * side, -1.9, 0.82 * 0.55 + 0.04),
+    const points: Vector3[] = [];
+    for (let i = 0; i <= 16; i += 1) {
+      const y = 3.45 - i * 0.21;
+      points.push(new Vector3((0.06 + i * 0.006) * side, y, radiusAt(y) * depth + 0.012));
+    }
+    body.add(new Mesh(new TubeGeometry(new CatmullRomCurve3(points), 64, 0.02, 6, false), trim));
+    const fold = new CatmullRomCurve3([
+      new Vector3(0.3 * side, 1.9, radiusAt(1.9) * depth * 0.985),
+      new Vector3(0.36 * side, 1.1, radiusAt(1.1) * depth * 0.985),
+      new Vector3(0.42 * side, 0.2, radiusAt(0.2) * depth * 0.985),
     ]);
-    body.add(new Mesh(new TubeGeometry(edge, 40, 0.018, 8, false), trim));
+    body.add(new Mesh(new TubeGeometry(fold, 24, 0.006, 6, false), toon('#120e14')));
   });
+
+  const arms = new Group();
+  body.add(arms);
+  [-1, 1].forEach((side) => {
+    const shoulder = new Vector3(0.56 * side, 3.6, 0.02);
+    const elbow = new Vector3(0.74 * side, 2.78, 0.12);
+    const wrist = new Vector3(0.5 * side, 2.5, 0.66);
+    const sleeveCurve = new CatmullRomCurve3([shoulder, new Vector3(0.7 * side, 3.2, 0.04), elbow, new Vector3(0.66 * side, 2.6, 0.4), wrist]);
+    const sleeve = withOutline(new Mesh(new TubeGeometry(sleeveCurve, 48, 0.15, 16, false), cloth), bodyOutline);
+    arms.add(sleeve);
+    const cuff = withOutline(new Mesh(new SphereGeometry(0.19, 24, 16), cloth), bodyOutline);
+    cuff.scale.set(1, 1, 0.55);
+    cuff.position.copy(wrist);
+    cuff.lookAt(wrist.clone().add(new Vector3(-0.3 * side, -0.1, 1)));
+    arms.add(cuff);
+    const cuffTrim = new Mesh(new TubeGeometry(new CatmullRomCurve3(Array.from({ length: 12 }, (_, i) => {
+      const a = (i / 12) * Math.PI * 2;
+      return new Vector3(Math.cos(a) * 0.18, Math.sin(a) * 0.18, 0.06);
+    }), true), 32, 0.014, 6, true), trim);
+    cuff.add(cuffTrim);
+    const hand = withOutline(new Mesh(new SphereGeometry(0.085, 24, 16), skin), bodyOutline);
+    hand.scale.set(0.8, 1.05, 0.7);
+    hand.position.set(0.47 * side, 2.56, 0.8);
+    arms.add(hand);
+  });
+
+  const tablet = new Group();
+  tablet.position.set(0, 2.6, 0.82);
+  tablet.rotation.x = -0.32;
+  arms.add(tablet);
+  const shell = withOutline(new Mesh(new BoxGeometry(0.98, 0.68, 0.05), toon('#1a161d')), bodyOutline);
+  tablet.add(shell);
+  const screen = new Mesh(new PlaneGeometry(0.88, 0.58), new MeshBasicMaterial({ map: screenTexture(), toneMapped: false }));
+  screen.position.z = 0.027;
+  tablet.add(screen);
+  hitTargets.push(shell);
+
+  [-1, 1].forEach((side) => {
+    const shoe = withOutline(new Mesh(new CapsuleGeometry(0.085, 0.14, 6, 16), toon('#141017')), bodyOutline);
+    shoe.rotation.x = Math.PI / 2;
+    shoe.position.set(0.2 * side, 0.08, 0.55);
+    body.add(shoe);
+  });
+
+  const shadow = new Mesh(new CircleGeometry(1.25, 48), new MeshBasicMaterial({ map: shadowTexture(), transparent: true, depthWrite: false, toneMapped: false }));
+  shadow.rotation.x = -Math.PI / 2;
+  shadow.position.y = 0.01;
+  shadow.scale.set(1, 0.8, 1);
+  root.add(shadow);
 
   let blinkScale = 1;
   return {
@@ -368,7 +487,12 @@ function buildProcedural(detail: number): Rig {
         irisMesh.position.x = look.x * 0.022;
         irisMesh.position.y = -look.y * 0.016;
       });
-      body.scale.y = 1 + Math.sin(t * 1.3) * 0.004;
+      const breath = Math.sin(t * 1.3);
+      body.scale.set(1 + breath * 0.004, 1 + breath * 0.006, 1 + breath * 0.004);
+      body.rotation.z = Math.sin(t * 0.7) * 0.012;
+      arms.position.y = breath * 0.012 + happy * 0.05;
+      tablet.rotation.x = -0.32 + happy * 0.12 + look.y * 0.04;
+      headPivot.position.y = 3.95 + breath * 0.012;
     },
   };
 }
@@ -389,8 +513,8 @@ async function loadVrm(scene: Scene): Promise<Rig | null> {
     VRMUtils.removeUnnecessaryVertices(gltf.scene);
     VRMUtils.rotateVRM0(vrm);
     const root = new Group();
-    vrm.scene.scale.setScalar(2.2);
-    vrm.scene.position.set(0, -2.1, 0);
+    vrm.scene.scale.setScalar(3);
+    vrm.scene.position.set(0, 0, 0);
     root.add(vrm.scene);
     scene.add(root);
     const headBone = vrm.humanoid.getNormalizedBoneNode('head') ?? vrm.scene;
@@ -428,7 +552,6 @@ export async function mountBust(canvas: HTMLCanvasElement, options: Options): Pr
 
   const scene = new Scene();
   const camera = new PerspectiveCamera(26, 1, 0.1, 50);
-  const lookAt = new Vector3(0, 1.15, 0);
 
   const key = new DirectionalLight('#fff1e4', 2.4);
   key.position.set(-3, 4, 5);
@@ -441,8 +564,16 @@ export async function mountBust(canvas: HTMLCanvasElement, options: Options): Pr
   fill.position.set(2.5, -1, 4);
   scene.add(key, rim, rimCool, hemi, fill);
 
-  const rig = (await loadVrm(scene)) ?? buildProcedural(options.lowPower ? 64 : 112);
+  const vrmRig = await loadVrm(scene);
+  if (!vrmRig) await new Promise((resolve) => window.setTimeout(resolve, 0));
+  const rig = vrmRig ?? buildProcedural(options.lowPower ? 48 : 112);
   if (!rig.root.parent) scene.add(rig.root);
+  await new Promise((resolve) => window.setTimeout(resolve, 0));
+  try {
+    await renderer.compileAsync(scene, camera);
+  } catch {
+    renderer.compile(scene, camera);
+  }
 
   const pointer = new Vector2(0, 0);
   const look = new Vector2(0, 0);
@@ -482,14 +613,47 @@ export async function mountBust(canvas: HTMLCanvasElement, options: Options): Pr
     window.addEventListener('click', onClick);
   }
 
+  const hero = canvas.closest<HTMLElement>('.hero');
+  const FIGURE = 4.85;
+  const stacked = window.matchMedia('(max-width: 600px), (max-aspect-ratio: 1/1)');
+  const frame3 = { x: 0, cy: 2.4, d: 14, wide: true };
+  const project = (x: number, y: number) => {
+    const v = new Vector3(x, y, 0).project(camera);
+    return { x: ((v.x + 1) / 2) * canvas.clientWidth, y: ((1 - v.y) / 2) * canvas.clientHeight };
+  };
+  const layout = () => {
+    const wide = !stacked.matches;
+    const rtl = baseYaw > 0;
+    const fx = wide ? (rtl ? 0.3 : 0.7) : 0.5;
+    const fit = wide ? 0.74 : 0.84;
+    const bottom = wide ? 0.92 : 0.95;
+    const visibleH = FIGURE / fit;
+    frame3.wide = wide;
+    frame3.d = visibleH / (2 * Math.tan((camera.fov * Math.PI) / 360));
+    frame3.cy = (bottom - 0.5) * visibleH;
+    frame3.x = (fx * 2 - 1) * (visibleH / 2) * camera.aspect;
+    rig.root.position.x = frame3.x;
+    camera.position.set(0, frame3.cy, frame3.d);
+    camera.lookAt(0, frame3.cy, 0);
+    camera.updateMatrixWorld();
+    if (hero) {
+      const top = project(frame3.x, FIGURE);
+      const foot = project(frame3.x, 0);
+      hero.style.setProperty('--fig-x', `${foot.x.toFixed(1)}px`);
+      hero.style.setProperty('--fig-top', `${top.y.toFixed(1)}px`);
+      hero.style.setProperty('--fig-foot', `${foot.y.toFixed(1)}px`);
+    }
+  };
+
   const resize = () => {
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
     if (!width || !height) return;
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
-    camera.fov = camera.aspect < 0.8 ? 34 : 26;
+    camera.fov = 26;
     camera.updateProjectionMatrix();
+    layout();
   };
 
   const render = (now: number) => {
@@ -523,13 +687,15 @@ export async function mountBust(canvas: HTMLCanvasElement, options: Options): Pr
     rig.headPivot.rotation.y = yaw + look.x * 0.36 + Math.sin(t * 0.45) * 0.03 * idle;
     rig.headPivot.rotation.x = look.y * 0.14 + Math.sin(t * 0.6) * 0.012 * idle - smoothScroll * 0.1 - bounce * 0.08;
     rig.headPivot.rotation.z = -look.x * 0.05 + happy * 0.08 * (yaw > 0 ? -1 : 1);
-    rig.root.rotation.y = yaw * 0.3 + look.x * 0.05 + smoothScroll * 0.55;
-    rig.root.position.y = -smoothScroll * 0.4 + bounce * 0.05;
+    rig.root.rotation.y = yaw * 0.3 + look.x * 0.05 + smoothScroll * 0.2;
+    rig.root.position.y = bounce * 0.05;
     rig.update(t, look, happy, blink);
 
-    const narrow = camera.aspect < 0.8;
-    camera.position.set(0, narrow ? 1.45 : 1.35, (narrow ? 10.6 : 9.6) - smoothScroll * 1.4);
-    camera.lookAt(lookAt);
+    const e = smoothScroll * smoothScroll * (3 - 2 * smoothScroll);
+    const focusX = frame3.x * e;
+    const focusY = frame3.cy + (4.15 - frame3.cy) * e;
+    camera.position.set(focusX, focusY, frame3.d + (3.4 - frame3.d) * e);
+    camera.lookAt(focusX, focusY, 0);
     renderer.render(scene, camera);
 
     const delta = now - lastFrame;
@@ -573,6 +739,7 @@ export async function mountBust(canvas: HTMLCanvasElement, options: Options): Pr
   return {
     setDirection(direction) {
       baseYaw = direction === 'rtl' ? 0.32 : -0.32;
+      layout();
       if (options.reducedMotion) requestAnimationFrame(render);
     },
     setScroll(progress) {

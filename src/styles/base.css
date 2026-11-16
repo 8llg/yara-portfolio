@@ -178,3 +178,15 @@ main:focus {
   background: var(--saffron);
   transform: rotate(45deg);
 }
+
+@media (min-width: 1880px) and (min-height: 960px) {
+  html {
+    font-size: 112.5%;
+  }
+}
+
+@media (min-width: 2400px) and (min-height: 1280px) {
+  html {
+    font-size: 137.5%;
+  }
+}

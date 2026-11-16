@@ -29,6 +29,14 @@ export function installCursor(): void {
     if (label) label.textContent = text;
   };
 
+  const classify = (el: Element | null) => {
+      const labelled = el?.closest<HTMLElement>('[data-cursor]');
+      if (labelled) setMode('label', labelled.dataset.cursor ?? '');
+      else if (el?.closest('a, button, [role="radio"], [role="switch"], input, label')) setMode('hover');
+      else if (el?.closest('.hero__stage, .bust')) setMode('portrait');
+      else setMode('');
+  };
+
   window.addEventListener(
     'pointermove',
     (event) => {
@@ -37,12 +45,19 @@ export function installCursor(): void {
       target.y = event.clientY;
       dot.classList.add('is-visible');
       if (!frame) frame = requestAnimationFrame(tick);
-      const el = event.target instanceof Element ? event.target : null;
-      const labelled = el?.closest<HTMLElement>('[data-cursor]');
-      if (labelled) setMode('label', labelled.dataset.cursor ?? '');
-      else if (el?.closest('a, button, [role="radio"], [role="switch"], input, label')) setMode('hover');
-      else if (el?.closest('.hero__stage, .bust')) setMode('portrait');
-      else setMode('');
+      classify(event.target instanceof Element ? event.target : null);
+    },
+    { passive: true },
+  );
+  let pending = 0;
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (pending || target.x < 0) return;
+      pending = requestAnimationFrame(() => {
+        pending = 0;
+        classify(document.elementFromPoint(target.x, target.y));
+      });
     },
     { passive: true },
   );

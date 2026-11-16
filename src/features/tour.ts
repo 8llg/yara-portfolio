@@ -10,7 +10,7 @@ interface Step {
 
 const steps: Step[] = [
   {
-    selector: '.hero__stage',
+    selector: '.hero__arch, .hero__stage',
     title: { en: 'An illustrated Yara', ar: 'يارا في صورة فنية' },
     body: {
       en: 'A real-time 3D portrait. Move your pointer and she follows it; switch language and she turns toward where your reading begins.',
@@ -114,7 +114,7 @@ export function startTour(api: AppApi): void {
     index = next;
     const step = steps[index];
     if (!step) return;
-    target = document.querySelector<HTMLElement>(step.selector);
+    target = [...document.querySelectorAll<HTMLElement>(step.selector)].find((el) => el.getClientRects().length > 0) ?? null;
     card.querySelector('.tour__progress')!.textContent = t({ en: `${index + 1} of ${steps.length}`, ar: `${index + 1} من ${steps.length}` });
     card.querySelector('.tour__title')!.textContent = t(step.title);
     card.querySelector('.tour__body')!.textContent = t(step.body);

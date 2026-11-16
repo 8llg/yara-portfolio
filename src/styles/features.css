@@ -413,6 +413,8 @@
   color: var(--on-night);
   --ink: var(--on-night);
   --ink-2: var(--on-night-2);
+  --ink-3: #8f7f86;
+  --green: var(--saffron);
   --rule: var(--night-line);
   --green: var(--saffron);
   --paper: var(--night);
