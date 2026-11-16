@@ -10,7 +10,7 @@ Yara works between two languages and two reading directions, so the site is buil
 
 ## Features
 
-- 3D character in a black abaya, hijab and niqab that follows the mouse and turns when the language changes
+- Full-body 3D character in a black abaya, hijab and niqab, standing in a Najdi arch. She follows the mouse, blinks, reacts on hover and turns when the language changes
 - Full English and Arabic versions (LTR and RTL)
 - Eight case studies with problem, role, solution and results
 - Impact explorer: 35 results from the CV, filterable by field
@@ -51,4 +51,6 @@ The build goes to `out/` and is deployed to GitHub Pages automatically on every 
 
 ## Performance
 
-Lighthouse on desktop: Performance 99, Accessibility 100, Best Practices 100.
+Lighthouse (production build): desktop 100 / 100 / 100, mobile 90 / 100 / 100 (Performance / Accessibility / Best Practices).
+
+The 3D character, animations and dialogs load on demand, and the character stops rendering when it is off screen.
